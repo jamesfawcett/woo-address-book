@@ -207,14 +207,15 @@ if ( ! is_plugin_active( $woo_path ) && ! is_plugin_active_for_network( $woo_pat
 		 * Adds a link/button to the my account page under the addresses for adding additional addresses to their account.
 		 *
 		 * @since 1.0.0
+		 * @since 1.4.0 Check for default shipping address before showing button
 		 */
 		public function add_additional_address_button() {
 
 			$user_id       = get_current_user_id();
 			$address_names = $this->get_address_names( $user_id );
-
 			$name = $this->set_new_address_name( $address_names );
 
+			if ( WC()->customer->get_shipping_postcode() ):
 			?>
 
 			<div class="add-new-address">
@@ -222,6 +223,7 @@ if ( ! is_plugin_active( $woo_path ) && ! is_plugin_active_for_network( $woo_pat
 			</div>
 
 			<?php
+			endif;
 		}
 
 		/**
@@ -565,7 +567,7 @@ if ( ! is_plugin_active( $woo_path ) && ! is_plugin_active_for_network( $woo_pat
 				$address_selector['address_book']['options']['add_new'] = __( 'Add New Address', 'wc-address-book' );
 
 				$fields['shipping'] = $address_selector + $fields['shipping'];
-			
+
 			}
 
 			return $fields;
@@ -802,7 +804,7 @@ if ( ! is_plugin_active( $woo_path ) && ! is_plugin_active_for_network( $woo_pat
 				$address_names = $this->get_address_names( $user_id );
 
 				// If a version of the address name exists with a slash, use it. Otherwise, trim the slash.
-				// Previous versions of this plugin was including the slash in the address name. 
+				// Previous versions of this plugin was including the slash in the address name.
 				// While not causing problems, it should not have happened in the first place.
 				// This enables backward compatibility.
 				if ( in_array( $_GET['address-book'], $address_names ) ) {
@@ -810,7 +812,7 @@ if ( ! is_plugin_active( $woo_path ) && ! is_plugin_active_for_network( $woo_pat
 				} else {
 					$name = trim($_GET['address-book'], '/');
 				}
-				
+
 				foreach ( $address_fields as $key => $value ) {
 
 					$newkey = str_replace( 'shipping', esc_attr( $name ), $key );
